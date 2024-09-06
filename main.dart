@@ -24,7 +24,9 @@ void main() async {
     print('7. Add Member');
     print('8. Delete Member');
     print('9. View Members');
-    print('10. Save & Exit');
+    print('10. Lend Book');
+    print('11. Return Book');
+    print('12. Save & Exit');
     print('Please choose an option: ');
 
     String? choice = stdin.readLineSync();
@@ -58,8 +60,14 @@ void main() async {
         libraryManager.viewMembers();
         break;
       case '10':
+        _lendBook(libraryManager);
+        break;
+      case '11':
+        _returnBook(libraryManager);
+        break;
+      case '12':
         await libraryManager.saveLibraryData();
-        print('bye bye friend!......');
+        print('Library data saved. Exiting...');
         exit(0);
       default:
         print('Invalid choice. Please try again.');
@@ -67,12 +75,37 @@ void main() async {
   }
 }
 
+void _lendBook(LibraryManager libraryManager) {
+  print('Enter ISBN of the book to lend: ');
+  String? isbn = stdin.readLineSync()?.trim();
+
+  print('Enter member ID: ');
+  String? memberId = stdin.readLineSync()?.trim();
+
+  if (isbn != null && memberId != null) {
+    libraryManager.lendBook(isbn, memberId);
+  } else {
+    print('Invalid input. Please try again.');
+  }
+}
+
+void _returnBook(LibraryManager libraryManager) {
+  print('Enter ISBN of the book to return: ');
+  String? isbn = stdin.readLineSync()?.trim();
+
+  print('Enter member ID: ');
+  String? memberId = stdin.readLineSync()?.trim();
+
+  if (isbn != null && memberId != null) {
+    libraryManager.returnBook(isbn, memberId);
+  } else {
+    print('Invalid input. Please try again.');
+  }
+}
+
 void _addBook(LibraryManager libraryManager) {
-  String? title;
-  String? author;
+  String? title, author, genre, isbn;
   int? year;
-  String? genre;
-  String? isbn;
 
   while (title == null || title.isEmpty) {
     print('Enter book title: ');
@@ -85,35 +118,32 @@ void _addBook(LibraryManager libraryManager) {
   while (author == null ||
       author.isEmpty ||
       !RegExp(r'^[a-zA-Z\s.]+$').hasMatch(author)) {
-    print('Enter book author (only letters,space  and dotes are allowed): ');
+    print('Enter book author (only letters, spaces, and dots): ');
     author = stdin.readLineSync()?.trim();
     if (author == null ||
         author.isEmpty ||
         !RegExp(r'^[a-zA-Z\s.]+$').hasMatch(author)) {
-      print(
-          'Invalid name. Please enter a valid name with only letters, spaces and dotes.');
+      print('Invalid author name. Please enter a valid name.');
     }
   }
 
-  while (year == null || year < 1000 || year > 2024) {
+  while (year == null || year < 1000 || year > DateTime.now().year) {
     print('Enter publication year (4-digit number): ');
     year = int.tryParse(stdin.readLineSync()?.trim() ?? '');
-    if (year == null || year < 1000 || year > 2024) {
-      print(
-          'Invalid publication year. Please enter a 4-digit number between 1000 and 2024.');
+    if (year == null || year < 1000 || year > DateTime.now().year) {
+      print('Invalid publication year. Please enter a 4-digit number.');
     }
   }
 
   while (genre == null ||
       genre.isEmpty ||
       !RegExp(r'^[a-zA-Z\s.]+$').hasMatch(genre)) {
-    print('Enter author name (only letters,space  and dotes are allowed): ');
+    print('Enter genre (only letters, spaces, and dots): ');
     genre = stdin.readLineSync()?.trim();
     if (genre == null ||
         genre.isEmpty ||
         !RegExp(r'^[a-zA-Z\s.]+$').hasMatch(genre)) {
-      print(
-          'Invalid name. Please enter a valid name with only letters, spaces and dotes.');
+      print('Invalid genre. Please try again.');
     }
   }
 
@@ -126,24 +156,25 @@ void _addBook(LibraryManager libraryManager) {
   }
 
   Book book = Book(
-    title: title,
-    author: author,
-    publicationYear: year,
-    genre: genre,
-    isbn: isbn,
-  );
+      title: title,
+      author: author,
+      publicationYear: year,
+      genre: genre,
+      isbn: isbn);
   libraryManager.addBook(book);
+  print('Book added successfully.');
 }
 
 void _deleteBook(LibraryManager libraryManager) {
   print('Enter ISBN of the book to delete: ');
-  String? isbn = stdin.readLineSync();
+  String? isbn = stdin.readLineSync()?.trim();
 
   if (isbn != null) {
     print('Are you sure you want to delete this book? (yes/no)');
-    String? confirmation = stdin.readLineSync();
-    if (confirmation?.toLowerCase() == 'yes') {
+    String? confirmation = stdin.readLineSync()?.trim().toLowerCase();
+    if (confirmation == 'yes') {
       libraryManager.deleteBook(isbn);
+      print('Book deleted successfully.');
     } else {
       print('Deletion cancelled.');
     }
@@ -159,45 +190,36 @@ void _addAuthor(LibraryManager libraryManager) {
   while (name == null ||
       name.isEmpty ||
       !RegExp(r'^[a-zA-Z\s.]+$').hasMatch(name)) {
-    print('Enter author name (only letters, spaces, and dotes available): ');
+    print('Enter author name (only letters, spaces, and dots): ');
     name = stdin.readLineSync()?.trim();
     if (name == null ||
         name.isEmpty ||
         !RegExp(r'^[a-zA-Z\s.]+$').hasMatch(name)) {
-      print(
-          'Invalid name. Please enter a valid name with only letter,space and dotes are avilable.');
+      print('Invalid name. Please enter a valid name.');
     }
   }
 
   while (dob == null) {
-    print('Enter author date of birth (yyyy-mm-dd): ');
+    print('Enter date of birth (yyyy-mm-dd): ');
     String? dobString = stdin.readLineSync()?.trim();
     dob = DateTime.tryParse(dobString ?? '');
     if (dob == null) {
-      print('Invalid date of birth. Please use the format yyyy-mm-dd.');
+      print('Invalid date of birth. Please try again.');
     }
   }
 
-  Author author = Author(
-    name: name,
-    dateOfBirth: dob,
-  );
+  Author author = Author(name: name, dateOfBirth: dob);
   libraryManager.addAuthor(author);
+  print('Author added successfully.');
 }
 
 void _deleteAuthor(LibraryManager libraryManager) {
   print('Enter author name to delete: ');
   String? name = stdin.readLineSync()?.trim();
 
-  if (name != null && name.isNotEmpty) {
+  if (name != null) {
     print('Are you sure you want to delete this author? (yes/no)');
     String? confirmation = stdin.readLineSync()?.trim().toLowerCase();
-
-    while (confirmation != 'yes' && confirmation != 'no') {
-      print('Invalid input. Please enter "yes" or "no": ');
-      confirmation = stdin.readLineSync()?.trim().toLowerCase();
-    }
-
     if (confirmation == 'yes') {
       libraryManager.deleteAuthor(name);
       print('Author deleted successfully.');
@@ -205,23 +227,21 @@ void _deleteAuthor(LibraryManager libraryManager) {
       print('Deletion cancelled.');
     }
   } else {
-    print('Invalid input. Please enter a valid author name.');
+    print('Invalid input. Please try again.');
   }
 }
 
 void _addMember(LibraryManager libraryManager) {
   print('Enter member name: ');
-  String? name = stdin.readLineSync();
+  String? name = stdin.readLineSync()?.trim();
 
   print('Enter member ID: ');
-  String? memberId = stdin.readLineSync();
+  String? memberId = stdin.readLineSync()?.trim();
 
   if (name != null && memberId != null) {
-    Member member = Member(
-      name: name,
-      memberId: memberId,
-    );
+    Member member = Member(name: name, memberId: memberId);
     libraryManager.addMember(member);
+    print('Member added successfully.');
   } else {
     print('Invalid input. Please try again.');
   }
@@ -229,13 +249,14 @@ void _addMember(LibraryManager libraryManager) {
 
 void _deleteMember(LibraryManager libraryManager) {
   print('Enter member ID to delete: ');
-  String? memberId = stdin.readLineSync();
+  String? memberId = stdin.readLineSync()?.trim();
 
   if (memberId != null) {
     print('Are you sure you want to delete this member? (yes/no)');
-    String? confirmation = stdin.readLineSync();
-    if (confirmation?.toLowerCase() == 'yes') {
+    String? confirmation = stdin.readLineSync()?.trim().toLowerCase();
+    if (confirmation == 'yes') {
       libraryManager.deleteMember(memberId);
+      print('Member deleted successfully.');
     } else {
       print('Deletion cancelled.');
     }

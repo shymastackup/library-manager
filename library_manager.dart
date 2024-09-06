@@ -33,6 +33,18 @@ class LibraryManager {
     }
   }
 
+ 
+
+  void lendBook(String isbn, String memberId) {
+   
+  }
+
+  void returnBook(String isbn, String memberId) {
+   
+  }
+
+
+
   void addAuthor(Author author) {
     if (authors.any((a) => a.name == author.name)) {
       print('An author with this name already exists.');
