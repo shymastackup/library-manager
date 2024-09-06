@@ -25,7 +25,6 @@ void main() async {
     print('8. Delete Member');
     print('9. View Members');
     print('10. Save & Exit');
-
     print('Please choose an option: ');
 
     String? choice = stdin.readLineSync();
@@ -58,10 +57,8 @@ void main() async {
       case '9':
         libraryManager.viewMembers();
         break;
-
       case '10':
         await libraryManager.saveLibraryData();
-
         print('bye bye friend!......');
         exit(0);
       default:
@@ -109,7 +106,7 @@ void _addBook(LibraryManager libraryManager) {
 
   while (genre == null ||
       genre.isEmpty ||
-      RegExp(r'^[a-zA-Z\s.]+$').hasMatch(genre)) {
+      !RegExp(r'^[a-zA-Z\s.]+$').hasMatch(genre)) {
     print('Enter author name (only letters,space  and dotes are allowed): ');
     genre = stdin.readLineSync()?.trim();
     if (genre == null ||
