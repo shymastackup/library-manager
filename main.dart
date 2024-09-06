@@ -109,7 +109,7 @@ void _addBook(LibraryManager libraryManager) {
 
   while (genre == null ||
       genre.isEmpty ||
-      !RegExp(r'^[a-zA-Z\s.]+$').hasMatch(genre)) {
+      RegExp(r'^[a-zA-Z\s.]+$').hasMatch(genre)) {
     print('Enter author name (only letters,space  and dotes are allowed): ');
     genre = stdin.readLineSync()?.trim();
     if (genre == null ||
